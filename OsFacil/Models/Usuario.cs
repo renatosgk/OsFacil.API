@@ -24,10 +24,8 @@ namespace OsFacil.Models
         [MaxLength(15, ErrorMessage ="A senha deve conter no máximo 15 caracteres")]
         public string PasswordHash { get; set; } = string.Empty;
 
-        [Required (ErrorMessage ="O Carro é obrigatório")]
-        [ForeignKey("Carro")]
-        public long CarroId { get; set; }
-        public Carro Carro { get; set; }
+
+        public ICollection<Carro> Carros { get; set; } = new List<Carro>();
 
         public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
     }

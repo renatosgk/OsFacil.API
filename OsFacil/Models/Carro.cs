@@ -27,6 +27,9 @@ namespace OsFacil.Models
         [RegularExpression(@"^[A-Z]{3}\d[A-Z\d]\d{2}$")]
         public string Placa { get; set; } = string.Empty;
 
-        public Usuario? Usuario { get; set; }
+        [Required(ErrorMessage = "Cliente obrigatório")]
+        [ForeignKey("Usuario")]
+        public long UsuarioId { get; set; }
+        public Usuario Usuario { get; set; }
     }
 }

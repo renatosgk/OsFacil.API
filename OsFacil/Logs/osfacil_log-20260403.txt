@@ -1,0 +1,29 @@
+2026-04-03 08:56:44 [WRN] Navigations 'Usuario.Carro' and 'Carro.Usuario' were separated into two relationships since the [ForeignKey] attribute was specified on properties 'CarroId' and 'UsuarioId' on both sides.
+2026-04-03 08:56:44 [WRN] No type was specified for the decimal property 'Salario' on entity type 'Funcionario'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType()', specify precision and scale using 'HasPrecision()' or configure a value converter using 'HasConversion()'.
+2026-04-03 08:56:44 [WRN] No type was specified for the decimal property 'PrecoUnitario' on entity type 'ItemServico'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType()', specify precision and scale using 'HasPrecision()' or configure a value converter using 'HasConversion()'.
+2026-04-03 08:56:44 [WRN] No type was specified for the decimal property 'Quantidade' on entity type 'ItemServico'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType()', specify precision and scale using 'HasPrecision()' or configure a value converter using 'HasConversion()'.
+2026-04-03 08:56:44 [WRN] No type was specified for the decimal property 'Valor' on entity type 'OrdemServico'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType()', specify precision and scale using 'HasPrecision()' or configure a value converter using 'HasConversion()'.
+2026-04-03 08:56:44 [WRN] Navigations 'Usuario.Carro' and 'Carro.Usuario' were separated into two relationships since the [ForeignKey] attribute was specified on properties 'CarroId' and 'UsuarioId' on both sides.
+2026-04-03 08:56:44 [WRN] No type was specified for the decimal property 'Salario' on entity type 'Funcionario'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType()', specify precision and scale using 'HasPrecision()' or configure a value converter using 'HasConversion()'.
+2026-04-03 08:56:44 [WRN] No type was specified for the decimal property 'PrecoUnitario' on entity type 'ItemServico'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType()', specify precision and scale using 'HasPrecision()' or configure a value converter using 'HasConversion()'.
+2026-04-03 08:56:44 [WRN] No type was specified for the decimal property 'Quantidade' on entity type 'ItemServico'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType()', specify precision and scale using 'HasPrecision()' or configure a value converter using 'HasConversion()'.
+2026-04-03 08:56:44 [WRN] No type was specified for the decimal property 'Valor' on entity type 'OrdemServico'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType()', specify precision and scale using 'HasPrecision()' or configure a value converter using 'HasConversion()'.
+2026-04-03 09:45:23 [INF] Iniciando a API OsFacil...
+2026-04-03 09:45:24 [INF] Now listening on: https://localhost:7217
+2026-04-03 09:45:24 [INF] Now listening on: http://localhost:5079
+2026-04-03 09:45:24 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-03 09:45:24 [INF] Hosting environment: Development
+2026-04-03 09:45:24 [INF] Content root path: C:\Users\Renato\source\repos\OsFacil\OsFacil
+2026-04-03 09:59:06 [INF] Iniciando a API OsFacil...
+2026-04-03 09:59:06 [INF] Now listening on: https://localhost:7217
+2026-04-03 09:59:06 [INF] Now listening on: http://localhost:5079
+2026-04-03 09:59:06 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-03 09:59:06 [INF] Hosting environment: Development
+2026-04-03 09:59:06 [INF] Content root path: C:\Users\Renato\source\repos\OsFacil\OsFacil
+2026-04-03 10:54:53 [INF] Iniciando a API OsFacil...
+2026-04-03 10:54:53 [INF] Now listening on: https://localhost:7217
+2026-04-03 10:54:53 [INF] Now listening on: http://localhost:5079
+2026-04-03 10:54:53 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-03 10:54:53 [INF] Hosting environment: Development
+2026-04-03 10:54:53 [INF] Content root path: C:\Users\Renato\source\repos\OsFacil\OsFacil
+2026-04-03 11:47:24 [INF] Iniciando a API OsFacil...
