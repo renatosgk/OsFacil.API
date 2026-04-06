@@ -53,10 +53,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));
 
 // --- 4. Health Checks ---
-builder.Services.AddHealthChecks()
-    .AddCheck<ApiHealthCheck>(
-        "osfacil_api",
-        tags: new[] { "api" });
+var healthBuilder = builder.Services.AddHealthChecks();
+
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    healthBuilder.AddDbContextCheck<AppDbContext>(
+        "oracle",
+        tags: new[] { "db", "oracle" });
+}
 
 
 // --- 5. OpenTelemetry (Observabilidade) ---
@@ -125,3 +129,4 @@ finally
 {
     Log.CloseAndFlush();
 }
+public partial class Program { }

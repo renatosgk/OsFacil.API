@@ -5,7 +5,7 @@ namespace OsFacil.Messaging;
 
 public class RabbitMqProducer(IConfiguration config)
 {
-    public void SendMessage(string message)
+    public virtual void SendMessage(string message)
     {
         var factory = new ConnectionFactory { HostName = config["RabbitMQ:Host"] ?? "localhost" };
 

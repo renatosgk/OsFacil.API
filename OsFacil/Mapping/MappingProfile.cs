@@ -9,26 +9,45 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-       
+      
         CreateMap<Usuario, UsuarioResponse>();
         CreateMap<UsuarioRequest, Usuario>();
 
-      
+        
         CreateMap<Carro, CarroResponse>();
         CreateMap<CarroRequest, Carro>();
 
-       
+        
         CreateMap<Funcionario, FuncionarioResponse>();
         CreateMap<FuncionarioRequest, Funcionario>();
 
        
         CreateMap<OrdemServico, OrdemServicoResponse>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+            .ConstructUsing(src => new OrdemServicoResponse(
+                src.Id,
+                src.Descricao,
+                src.Valor, 
+                src.DataCriacao,
+                src.CarroId,
+                src.UsuarioId,
+                src.FuncionarioId,
+                src.Status.ToString()
+            ))
+            .ForAllMembers(opt => opt.Ignore()); 
+
         CreateMap<OrdemServicoRequest, OrdemServico>();
 
-       
+     
         CreateMap<ItemServico, ItemServicoResponse>()
-            .ForMember(dest => dest.ValorTotal, opt => opt.MapFrom(src => src.PrecoUnitario * src.Quantidade));
+            .ConstructUsing(src => new ItemServicoResponse(
+                src.Id,
+                src.Descricao,
+                src.PrecoUnitario,
+                src.Quantidade,
+                src.PrecoUnitario * src.Quantidade
+            ))
+            .ForAllMembers(opt => opt.Ignore()); 
+
         CreateMap<ItemServicoRequest, ItemServico>();
     }
 }

@@ -1,0 +1,14 @@
+2026-04-06 17:55:23 [INF] Iniciando a API OsFacil...
+2026-04-06 17:55:23 [INF] [RabbitMQ] Aguardando novas Ordens de Serviço na fila 'os-criada'...
+2026-04-06 17:55:23 [WRN] Failed to determine the https port for redirect.
+2026-04-06 17:55:23 [WRN] You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-04-06 17:55:23 [WRN] You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-04-06 17:55:23 [WRN] You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-04-06 17:55:23 [WRN] You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-04-06 17:55:23 [WRN] Falha ao adicionar item: Ordem de Serviço 9999 inexistente.
+2026-04-06 17:55:24 [INF] Funcionário cadastrado: Mecânico de Teste - Cargo: Senior
+2026-04-06 17:55:24 [INF] Usuário criado: 1 - it@teste.com
+2026-04-06 17:55:24 [INF] Usuário criado: 2 - dono@os.com
+2026-04-06 17:55:24 [INF] Listando todos os usuários/clientes
+2026-04-06 17:55:24 [WRN] Usuário 9999 não encontrado
+2026-04-06 17:55:24 [INF] Item 'Pastilha de Freio' adicionado à OS 2.
