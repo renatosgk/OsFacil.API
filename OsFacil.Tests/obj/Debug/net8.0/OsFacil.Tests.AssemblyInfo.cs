@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OsFacil.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2b2567a6e4d302a531d764a15c9d70c724256e7f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2d8e772e4c4e47bc706921fca5a4166c621654a6")]
 [assembly: System.Reflection.AssemblyProductAttribute("OsFacil.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OsFacil.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

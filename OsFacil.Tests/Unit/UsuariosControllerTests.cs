@@ -1,32 +1,34 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Moq;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using AutoMapper;
-using OsFacil.Data;
-using OsFacil.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Moq;
 using OsFacil.Controllers;
+using OsFacil.Data;
 using OsFacil.DTO.Request;
 using OsFacil.DTO.Response;
 using OsFacil.Messaging;
+using OsFacil.Models;
+using OsFacil.MongoDB;
 
 namespace OsFacil.Tests.Unit;
 
 public class UsuariosControllerTests
 {
-    private readonly Mock<IMapper> _mapperMock;
-    private readonly Mock<ILogger<UsuariosController>> _loggerMock;
+    private readonly Mock<IMapper> _mapperMock = new();
+    private readonly Mock<ILogger<UsuariosController>> _loggerMock = new();
     private readonly Mock<RabbitMqProducer> _busMock;
+    private readonly Mock<IMongoAuditService> _auditMock = new();
 
     public UsuariosControllerTests()
     {
-        _mapperMock = new Mock<IMapper>();
-        _loggerMock = new Mock<ILogger<UsuariosController>>();
-
-        
         var configMock = new Mock<IConfiguration>();
         _busMock = new Mock<RabbitMqProducer>(configMock.Object);
+        _auditMock.Setup(m => m.RegistrarAsync(
+            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<long?>(),
+            It.IsAny<string?>(), It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
     }
 
     private AppDbContext GetContext()
@@ -37,85 +39,87 @@ public class UsuariosControllerTests
         return new AppDbContext(opt);
     }
 
+    private UsuariosController CreateController(AppDbContext ctx) =>
+        new(ctx, _mapperMock.Object, _loggerMock.Object, _busMock.Object, _auditMock.Object);
+
+    // --- Arrange / Act / Assert ---
+
     [Fact]
     public async Task Create_DadosValidos_SalvaEEnviaMensagem()
     {
-      
+        // Arrange
         var ctx = GetContext();
-        var ctrl = new UsuariosController(ctx, _mapperMock.Object, _loggerMock.Object, _busMock.Object);
+        var ctrl = CreateController(ctx);
+        var request = new UsuarioRequest("Renato", "renato@teste.com", "123456");
+        var entity = new Usuario { Id = 1, Nome = "Renato", Email = "renato@teste.com" };
 
-        var request = new UsuarioRequest( "Renato", "renato@teste.com", "123");
-        var usuarioEntity = new Usuario { Id = 1, Nome = "Renato", Email = "renato@teste.com" };
+        _mapperMock.Setup(m => m.Map<Usuario>(request)).Returns(entity);
 
-        _mapperMock.Setup(m => m.Map<Usuario>(request)).Returns(usuarioEntity);
-
-       
+        // Act
         var result = await ctrl.Create(request);
 
-       
-        var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-        Assert.Equal(1, ctx.Usuarios.Count()); 
-        _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("USUARIO_CRIADO"))), Times.Once); 
+        // Assert
+        Assert.IsType<CreatedAtActionResult>(result);
+        Assert.Equal(1, ctx.Usuarios.Count());
+        _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("USUARIO_CRIADO"))), Times.Once);
     }
 
     [Fact]
     public async Task GetById_UsuarioInexistente_Retorna404()
     {
-        
+        // Arrange
         var ctx = GetContext();
-        var ctrl = new UsuariosController(ctx, _mapperMock.Object, _loggerMock.Object, _busMock.Object);
+        var ctrl = CreateController(ctx);
 
-        
+        // Act
         var result = await ctrl.GetById(999);
 
-        
+        // Assert
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact]
     public async Task Delete_UsuarioExiste_RemoveEEnviaMensagem()
     {
-        
+        // Arrange
         var ctx = GetContext();
-        var usuario = new Usuario { Id = 1, Nome = "Para Deletar", Email = "del@teste.com" };
-        ctx.Usuarios.Add(usuario);
+        ctx.Usuarios.Add(new Usuario { Id = 1, Nome = "Para Deletar", Email = "del@teste.com" });
         await ctx.SaveChangesAsync();
+        var ctrl = CreateController(ctx);
 
-        var ctrl = new UsuariosController(ctx, _mapperMock.Object, _loggerMock.Object, _busMock.Object);
-
-        
+        // Act
         var result = await ctrl.Delete(1);
 
-       
+        // Assert
         Assert.IsType<NoContentResult>(result);
-        Assert.Equal(0, ctx.Usuarios.Count()); 
+        Assert.Equal(0, ctx.Usuarios.Count());
         _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("USUARIO_REMOVIDO"))), Times.Once);
     }
 
     [Fact]
     public async Task GetAll_ExistemUsuarios_RetornaListaMapeada()
     {
-        
+        // Arrange
         var ctx = GetContext();
         ctx.Usuarios.Add(new Usuario { Nome = "User 1" });
         ctx.Usuarios.Add(new Usuario { Nome = "User 2" });
         await ctx.SaveChangesAsync();
 
-        var usuariosResponse = new List<UsuarioResponse> {
-            new UsuarioResponse(1, "Usuario 1", "user1@teste.com", DateTime.Now),
-            new UsuarioResponse(2, "Usuario 2", "user2@teste.com", DateTime.Now)
+        var mockResp = new List<UsuarioResponse>
+        {
+            new(1, "Usuario 1", "user1@teste.com", DateTime.Now),
+            new(2, "Usuario 2", "user2@teste.com", DateTime.Now)
         };
         _mapperMock.Setup(m => m.Map<IEnumerable<UsuarioResponse>>(It.IsAny<IEnumerable<Usuario>>()))
-                   .Returns(usuariosResponse);
+                   .Returns(mockResp);
 
-        var ctrl = new UsuariosController(ctx, _mapperMock.Object, _loggerMock.Object, _busMock.Object);
+        var ctrl = CreateController(ctx);
 
-      
-        var result = await ctrl.GetAll();
+        // Act
+        var result = await ctrl.GetAll(new Common.PaginationParams());
 
-        
+        // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var lista = Assert.IsAssignableFrom<IEnumerable<UsuarioResponse>>(okResult.Value);
-        Assert.Equal(2, lista.Count());
+        Assert.NotNull(okResult.Value);
     }
 }

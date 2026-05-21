@@ -1,0 +1,11 @@
+2026-05-21 14:37:51 [INF]  Iniciando a API OsFacil...
+2026-05-21 14:37:52 [WRN] Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware Failed to determine the https port for redirect.
+2026-05-21 14:37:52 [WRN] LuckyPennySoftware.AutoMapper.License You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-05-21 14:37:52 [INF] OsFacil.Controllers.FuncionariosController Funcionário Mecanico Teste cadastrado.
+2026-05-21 14:37:52 [INF] OsFacil.Controllers.CarrosController Carro DEL1234 cadastrado.
+2026-05-21 14:37:52 [INF] OsFacil.Controllers.CarrosController Carro FLX1234 cadastrado.
+2026-05-21 14:37:52 [INF] OsFacil.Controllers.CarrosController Carro 1 removido.
+2026-05-21 14:37:52 [INF] OsFacil.Controllers.OrdemServicoController Nova OS 1 criada para FLX1234
+2026-05-21 14:37:52 [WRN] OsFacil.Controllers.CarrosController UsuarioId inexistente: 9999
+2026-05-21 14:37:52 [INF] OsFacil.Controllers.OrdemServicoController OS 1 atualizada.
+2026-05-21 14:37:52 [INF] OsFacil.Controllers.UsuariosController Usuário criado: 1 - per@teste.com

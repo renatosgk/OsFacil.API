@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OsFacil</name>
+    </assembly>
+    <members>
+        <member name="T:OsFacil.Controllers.AuditController">
+            <summary>Consulta de logs de auditoria (MongoDB)</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.AuditController.GetLogs(System.String,System.Int32)">
+            <summary>Lista logs de auditoria armazenados no MongoDB</summary>
+            <param name="entidade">Filtrar por entidade (ex: Usuario, Carro, OrdemServico)</param>
+            <param name="limite">Quantidade máxima de registros (padrão: 100)</param>
+        </member>
+        <member name="T:OsFacil.Controllers.AuthController">
+            <summary>Autenticação JWT</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.AuthController.Login(OsFacil.DTO.Request.LoginRequest)">
+            <summary>Realiza login e retorna token JWT</summary>
+            <param name="request">Credenciais de acesso</param>
+            <returns>Token JWT com dados do usuário</returns>
+        </member>
+        <member name="T:OsFacil.Controllers.CarrosController">
+            <summary>Gerenciamento de veículos</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.CarrosController.GetAll(OsFacil.Common.PaginationParams)">
+            <summary>Lista veículos com paginação e filtro</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.CarrosController.GetById(System.Int64)">
+            <summary>Obtém veículo por ID</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.CarrosController.Create(OsFacil.DTO.Request.CarroRequest)">
+            <summary>Cadastra novo veículo</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.CarrosController.Update(System.Int64,OsFacil.DTO.Request.CarroRequest)">
+            <summary>Atualiza veículo</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.CarrosController.Delete(System.Int64)">
+            <summary>Remove veículo</summary>
+        </member>
+        <member name="T:OsFacil.Controllers.FuncionariosController">
+            <summary>Gerenciamento de funcionários</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.FuncionariosController.GetAll(OsFacil.Common.PaginationParams)">
+            <summary>Lista funcionários com paginação e filtro</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.FuncionariosController.GetById(System.Int64)">
+            <summary>Obtém funcionário por ID</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.FuncionariosController.Create(OsFacil.DTO.Request.FuncionarioRequest)">
+            <summary>Cadastra funcionário</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.FuncionariosController.Update(System.Int64,OsFacil.DTO.Request.FuncionarioRequest)">
+            <summary>Atualiza funcionário</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.FuncionariosController.Delete(System.Int64)">
+            <summary>Remove funcionário</summary>
+        </member>
+        <member name="T:OsFacil.Controllers.ItemServicoController">
+            <summary>Itens de serviço vinculados a Ordens de Serviço</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.ItemServicoController.GetAll(OsFacil.Common.PaginationParams)">
+            <summary>Lista todos os itens de serviço com paginação</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.ItemServicoController.GetByOrdem(System.Int64)">
+            <summary>Lista itens de uma Ordem de Serviço específica</summary>
+            <param name="ordemId">ID da Ordem de Serviço</param>
+        </member>
+        <member name="M:OsFacil.Controllers.ItemServicoController.GetById(System.Int64)">
+            <summary>Obtém item de serviço por ID</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.ItemServicoController.Create(OsFacil.DTO.Request.ItemServicoRequest)">
+            <summary>Adiciona item a uma Ordem de Serviço</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.ItemServicoController.Update(System.Int64,OsFacil.DTO.Request.ItemServicoRequest)">
+            <summary>Atualiza item de serviço</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.ItemServicoController.Delete(System.Int64)">
+            <summary>Remove item de serviço</summary>
+        </member>
+        <member name="T:OsFacil.Controllers.OrdemServicoController">
+            <summary>Ordens de Serviço</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.OrdemServicoController.GetAll(OsFacil.Common.PaginationParams)">
+            <summary>Lista Ordens de Serviço com paginação, filtro e ordenação</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.OrdemServicoController.GetById(System.Int64)">
+            <summary>Obtém Ordem de Serviço por ID</summary>
+            <param name="id">ID da OS</param>
+        </member>
+        <member name="M:OsFacil.Controllers.OrdemServicoController.Create(OsFacil.DTO.Request.OrdemServicoRequest)">
+            <summary>Cria nova Ordem de Serviço</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.OrdemServicoController.UpdateStatus(System.Int64,OsFacil.Enum.StatusOS)">
+            <summary>Atualiza status da OS</summary>
+            <param name="id">ID da OS</param>
+            <param name="novoStatus">Novo status</param>
+        </member>
+        <member name="M:OsFacil.Controllers.OrdemServicoController.Update(System.Int64,OsFacil.DTO.Request.OrdemServicoRequest)">
+            <summary>Atualiza Ordem de Serviço</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.OrdemServicoController.Delete(System.Int64)">
+            <summary>Remove Ordem de Serviço</summary>
+        </member>
+        <member name="T:OsFacil.Controllers.UsuariosController">
+            <summary>Gerenciamento de usuários/clientes</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.UsuariosController.GetAll(OsFacil.Common.PaginationParams)">
+            <summary>Lista usuários com paginação e filtro</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.UsuariosController.GetById(System.Int64)">
+            <summary>Obtém usuário por ID</summary>
+            <param name="id">ID do usuário</param>
+        </member>
+        <member name="M:OsFacil.Controllers.UsuariosController.Create(OsFacil.DTO.Request.UsuarioRequest)">
+            <summary>Cria novo usuário</summary>
+        </member>
+        <member name="M:OsFacil.Controllers.UsuariosController.Update(System.Int64,OsFacil.DTO.Request.UsuarioRequest)">
+            <summary>Atualiza usuário existente</summary>
+            <param name="id">ID do usuário</param>
+        </member>
+        <member name="M:OsFacil.Controllers.UsuariosController.Delete(System.Int64)">
+            <summary>Remove usuário</summary>
+            <param name="id">ID do usuário</param>
+        </member>
+        <member name="T:OsFacil.Migrations.CriarTabelas">
+            <inheritdoc />
+        </member>
+        <member name="M:OsFacil.Migrations.CriarTabelas.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:OsFacil.Migrations.CriarTabelas.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:OsFacil.Migrations.CriarTabelas.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

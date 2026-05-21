@@ -1,19 +1,26 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using OsFacil.Data;
 using OsFacil.HealthChecks;
 using OsFacil.Messaging;
+
+using OsFacil.MongoDB;
 using OsFacil.Profiles;
+using OsFacil.Repositories;
+using OsFacil.Services;
 using Serilog;
+using System.Text;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. Serilog (ConfiguraÁ„o de Logs) ---
+// --- 1. Serilog ---
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
@@ -22,14 +29,13 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File(
         "Logs/osfacil_log-.txt",
         rollingInterval: RollingInterval.Day,
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
     .Enrich.FromLogContext()
     .CreateLogger();
 
 builder.Host.UseSerilog();
 
-// --- 2. Controllers + JSON Config ---
-
+// --- 2. Controllers + JSON ---
 builder.Services.AddControllers()
     .AddJsonOptions(opt =>
     {
@@ -40,38 +46,109 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+// --- 3. Swagger com JWT ---
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "OsFacil API",
+        Version = "v1",
+        Description = "API para gerenciamento de Ordens de Servi√ßo de oficina mec√¢nica. " +
+                      "Utiliza Oracle (EF Core), MongoDB (auditoria), RabbitMQ e JWT.",
+        Contact = new OpenApiContact
+        {
+            Name = "Equipe OsFacil",
+            Email = "contato@osfacil.com"
+        }
+    });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Informe o token JWT no formato: Bearer {seu_token}"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+        c.IncludeXmlComments(xmlPath);
+});
+
+// --- 4. AutoMapper ---
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 
-builder.Services.AddHostedService<RabbitMqConsumer>();
+// --- 5. JWT Authentication ---
+var jwtKey = builder.Configuration["Jwt:Key"]!;
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt =>
+    {
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
 
+builder.Services.AddAuthorization();
+
+// --- 6. TokenService ---
+builder.Services.AddScoped<TokenService>();
+
+// --- 7. RabbitMQ ---
+builder.Services.AddHostedService<RabbitMqConsumer>();
 builder.Services.AddSingleton<RabbitMqProducer>();
 
-// --- 3. Entity Framework + Oracle ---
+// --- 8. Entity Framework + Oracle ---
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));
 
-// --- 4. Health Checks ---
+// --- 9. Repository Pattern ---
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+// --- 10. MongoDB ---
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDb"));
+builder.Services.AddSingleton<IMongoAuditService, MongoAuditService>();
+
+// --- 11. Health Checks ---
 var healthBuilder = builder.Services.AddHealthChecks();
+healthBuilder.AddCheck<ApiHealthCheck>("api", tags: new[] { "api" });
 
 if (!builder.Environment.IsEnvironment("Testing"))
 {
-    healthBuilder.AddDbContextCheck<AppDbContext>(
-        "oracle",
-        tags: new[] { "db", "oracle" });
+    healthBuilder.AddDbContextCheck<AppDbContext>("oracle", tags: new[] { "db", "oracle" });
+
+    healthBuilder.AddCheck<MongoDbHealthCheck>("mongodb", tags: new[] { "db", "mongodb" });
 }
 
-
-// --- 5. OpenTelemetry (Observabilidade) ---
+// --- 12. OpenTelemetry ---
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracing =>
     {
         tracing
-            .SetResourceBuilder(ResourceBuilder.CreateDefault()
-                .AddService("OsFacil"))
+            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("OsFacil"))
             .AddAspNetCoreInstrumentation()
-            .AddEntityFrameworkCoreInstrumentation() 
+            .AddEntityFrameworkCoreInstrumentation()
             .AddConsoleExporter();
     })
     .WithMetrics(metrics =>
@@ -83,17 +160,20 @@ builder.Services.AddOpenTelemetry()
 
 var app = builder.Build();
 
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "OsFacil API v1");
+        c.RoutePrefix = "swagger";
+    });
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
@@ -129,4 +209,5 @@ finally
 {
     Log.CloseAndFlush();
 }
+
 public partial class Program { }

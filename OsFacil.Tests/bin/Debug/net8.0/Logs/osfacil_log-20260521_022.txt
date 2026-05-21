@@ -1,0 +1,9 @@
+2026-05-21 14:34:19 [INF]  Iniciando a API OsFacil...
+2026-05-21 14:34:19 [WRN] Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware Failed to determine the https port for redirect.
+2026-05-21 14:34:19 [WRN] LuckyPennySoftware.AutoMapper.License You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-05-21 14:34:19 [WRN] Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware Failed to determine the https port for redirect.
+2026-05-21 14:34:19 [WRN] LuckyPennySoftware.AutoMapper.License You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-05-21 14:34:19 [WRN] OsFacil.Controllers.ItemServicoController OS 9999 inexistente.
+2026-05-21 14:34:20 [INF] OsFacil.Controllers.CarrosController Carro DEL1234 cadastrado.
+2026-05-21 14:36:05 [INF]  Iniciando a API OsFacil...
+2026-05-21 14:36:06 [WRN] Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware Failed to determine the https port for redirect.

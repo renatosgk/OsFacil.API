@@ -1,48 +1,89 @@
-﻿
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OsFacil.Common;
 using OsFacil.Data;
 using OsFacil.DTO.Request;
 using OsFacil.DTO.Response;
 using OsFacil.Enum;
-using OsFacil.Models;
 using OsFacil.Messaging;
+using OsFacil.Models;
+using OsFacil.MongoDB;
 
 namespace OsFacil.Controllers;
 
+/// <summary>Ordens de Serviço</summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
+[Produces("application/json")]
 public class OrdemServicoController : ControllerBase
 {
     private readonly AppDbContext _ctx;
     private readonly IMapper _mapper;
     private readonly ILogger<OrdemServicoController> _log;
     private readonly RabbitMqProducer _bus;
+    private readonly IMongoAuditService _audit;
 
-    public OrdemServicoController(AppDbContext ctx, IMapper mapper, ILogger<OrdemServicoController> log, RabbitMqProducer bus)
+    public OrdemServicoController(AppDbContext ctx, IMapper mapper, ILogger<OrdemServicoController> log,
+        RabbitMqProducer bus, IMongoAuditService audit)
     {
         _ctx = ctx;
         _mapper = mapper;
         _log = log;
         _bus = bus;
+        _audit = audit;
     }
 
+    /// <summary>Lista Ordens de Serviço com paginação, filtro e ordenação</summary>
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [ProducesResponseType(typeof(PagedResult<HateoasResponse<OrdemServicoResponse>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll([FromQuery] PaginationParams p)
     {
-        _log.LogInformation("Listando todas as Ordens de Serviço.");
-        var ordens = await _ctx.OrdensServico
+        _log.LogInformation("Listando OSs - Página {Page}", p.Page);
+
+        var query = _ctx.OrdensServico
             .Include(o => o.Usuario)
             .Include(o => o.Carro)
-            .ToListAsync();
+            .AsQueryable();
 
-       
-        var response = _mapper.Map<IEnumerable<OrdemServicoResponse>>(ordens);
-        return Ok(response);
+        if (!string.IsNullOrWhiteSpace(p.Filter))
+            query = query.Where(o => o.Descricao.Contains(p.Filter));
+
+        query = (p.OrderBy?.ToLower(), p.OrderDir.ToLower()) switch
+        {
+            ("data", "desc") => query.OrderByDescending(o => o.DataCriacao),
+            ("data", _) => query.OrderBy(o => o.DataCriacao),
+            ("valor", "desc") => query.OrderByDescending(o => o.Valor),
+            ("valor", _) => query.OrderBy(o => o.Valor),
+            ("status", "desc") => query.OrderByDescending(o => o.Status),
+            ("status", _) => query.OrderBy(o => o.Status),
+            _ => query.OrderByDescending(o => o.DataCriacao)
+        };
+
+        var total = await query.CountAsync();
+        var items = await query.Skip((p.Page - 1) * p.PageSize).Take(p.PageSize).ToListAsync();
+
+        var mapped = _mapper.Map<IEnumerable<OrdemServicoResponse>>(items)
+            .Select(o => new HateoasResponse<OrdemServicoResponse>(o)
+                .AddLink(Url?.Action(nameof(GetById), new { id = o.Id }) ?? string.Empty, "self")
+                .AddLink(Url?.Action(nameof(Update), new { id = o.Id }) ?? string.Empty, "update", "PUT")
+                .AddLink(Url?.Action(nameof(UpdateStatus), new { id = o.Id }) ?? string.Empty, "update-status", "PATCH")
+                .AddLink(Url?.Action(nameof(Delete), new { id = o.Id }) ?? string.Empty, "delete", "DELETE"))
+            .ToList();
+
+        return Ok(new PagedResult<HateoasResponse<OrdemServicoResponse>>
+        {
+            Data = mapped, Page = p.Page, PageSize = p.PageSize, TotalCount = total
+        });
     }
 
+    /// <summary>Obtém Ordem de Serviço por ID</summary>
+    /// <param name="id">ID da OS</param>
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(HateoasResponse<OrdemServicoResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(long id)
     {
         var os = await _ctx.OrdensServico
@@ -58,13 +99,22 @@ public class OrdemServicoController : ControllerBase
             return NotFound();
         }
 
-        return Ok(_mapper.Map<OrdemServicoResponse>(os));
+        var response = new HateoasResponse<OrdemServicoResponse>(_mapper.Map<OrdemServicoResponse>(os))
+            .AddLink(Url?.Action(nameof(GetById), new { id }) ?? string.Empty, "self")
+            .AddLink(Url?.Action(nameof(Update), new { id }) ?? string.Empty, "update", "PUT")
+            .AddLink(Url?.Action(nameof(UpdateStatus), new { id }) ?? string.Empty, "update-status", "PATCH")
+            .AddLink(Url?.Action(nameof(Delete), new { id }) ?? string.Empty, "delete", "DELETE")
+            .AddLink(Url?.Action(nameof(GetAll)) ?? string.Empty, "collection");
+
+        return Ok(response);
     }
 
+    /// <summary>Cria nova Ordem de Serviço</summary>
     [HttpPost]
+    [ProducesResponseType(typeof(OrdemServicoResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(OrdemServicoRequest request)
     {
-       
         var user = await _ctx.Usuarios.FindAsync(request.UsuarioId);
         var car = await _ctx.Carros.FindAsync(request.CarroId);
         var func = await _ctx.Funcionarios.FindAsync(request.FuncionarioId);
@@ -75,21 +125,24 @@ public class OrdemServicoController : ControllerBase
             return BadRequest("Verifique se UsuarioId, CarroId e FuncionarioId existem no banco.");
         }
 
-        
         var os = _mapper.Map<OrdemServico>(request);
-
         _ctx.OrdensServico.Add(os);
         await _ctx.SaveChangesAsync();
 
-        _log.LogInformation("Nova OS Criada: {Id} para o veículo {Placa}", os.Id, car.Placa);
+        _log.LogInformation("Nova OS {Id} criada para {Placa}", os.Id, car.Placa);
         _bus.SendMessage($"OS_CRIADA|Id:{os.Id}|Carro:{car.Placa}|Cliente:{user.Nome}");
+        await _audit.RegistrarAsync("OrdemServico", "CRIACAO", os.Id, user.Email,
+            $"Carro: {car.Placa} | Funcionário: {func.Nome}");
 
-       
-        var response = _mapper.Map<OrdemServicoResponse>(os);
-        return CreatedAtAction(nameof(GetById), new { id = os.Id }, response);
+        return CreatedAtAction(nameof(GetById), new { id = os.Id }, _mapper.Map<OrdemServicoResponse>(os));
     }
 
+    /// <summary>Atualiza status da OS</summary>
+    /// <param name="id">ID da OS</param>
+    /// <param name="novoStatus">Novo status</param>
     [HttpPatch("{id}/status")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateStatus(long id, [FromBody] StatusOS novoStatus)
     {
         var os = await _ctx.OrdensServico.FindAsync(id);
@@ -98,31 +151,40 @@ public class OrdemServicoController : ControllerBase
         os.Status = novoStatus;
         await _ctx.SaveChangesAsync();
 
-        _log.LogInformation("Status da OS {Id} alterado para {Status}", id, novoStatus);
+        _log.LogInformation("Status da OS {Id} → {Status}", id, novoStatus);
         _bus.SendMessage($"OS_STATUS_ALTERADO|Id:{id}|NovoStatus:{novoStatus}");
+        await _audit.RegistrarAsync("OrdemServico", "MUDANCA_STATUS", id, detalhes: $"Novo status: {novoStatus}");
+
         return NoContent();
     }
 
+    /// <summary>Atualiza Ordem de Serviço</summary>
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(long id, OrdemServicoRequest request)
     {
         var existing = await _ctx.OrdensServico.FindAsync(id);
         if (existing == null) return NotFound();
 
-        
         var func = await _ctx.Funcionarios.FindAsync(request.FuncionarioId);
         if (func == null) return BadRequest("Funcionário informado não existe.");
 
-        
         _mapper.Map(request, existing);
-
         await _ctx.SaveChangesAsync();
-        _log.LogInformation("OS {Id} atualizada com sucesso.", id);
+
+        _log.LogInformation("OS {Id} atualizada.", id);
         _bus.SendMessage($"OS_ATUALIZADA|Id:{id}");
+        await _audit.RegistrarAsync("OrdemServico", "ATUALIZACAO", id);
+
         return NoContent();
     }
 
+    /// <summary>Remove Ordem de Serviço</summary>
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(long id)
     {
         var os = await _ctx.OrdensServico.FindAsync(id);
@@ -133,6 +195,8 @@ public class OrdemServicoController : ControllerBase
 
         _log.LogInformation("OS {Id} removida.", id);
         _bus.SendMessage($"OS_REMOVIDA|Id:{id}");
+        await _audit.RegistrarAsync("OrdemServico", "REMOCAO", id);
+
         return NoContent();
     }
 }

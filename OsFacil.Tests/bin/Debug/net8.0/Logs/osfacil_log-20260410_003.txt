@@ -1,0 +1,11 @@
+2026-04-10 11:09:51 [INF] Iniciando a API OsFacil...
+2026-04-10 11:09:51 [WRN] You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-04-10 11:09:51 [WRN] You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-04-10 11:09:51 [WRN] You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-04-10 11:09:51 [INF] Funcionário cadastrado: Mecânico de Teste - Cargo: Senior
+2026-04-10 11:09:51 [WRN] Falha ao adicionar item: Ordem de Serviço 9999 inexistente.
+2026-04-10 11:09:51 [INF] Funcionário cadastrado: Carlos Silva - Cargo: Auxiliar
+2026-04-10 11:09:51 [INF] Dados do funcionário ID 2 atualizados.
+2026-04-10 11:09:51 [INF] Funcionário ID 2 removido do sistema.
+2026-04-10 11:09:51 [WRN] Failed to determine the https port for redirect.
+2026-04-10 11:09:51 [WRN] You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
