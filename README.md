@@ -191,7 +191,6 @@ Arquivo: `OsFacil/appsettings.json`
 }
 ```
 
-> Em produção substitua a `Jwt:Key` por uma chave aleatória de pelo menos 256 bits e proteja-a via variáveis de ambiente ou Azure Key Vault.
 
 ---
 
