@@ -40,14 +40,14 @@ public class ItemServicoIntegrationTests : IClassFixture<CustomWebApplicationFac
     [Fact]
     public async Task Post_ItemValido_DeveRetornar201Created()
     {
-        // Arrange
+        
         var os = await CriarOSCompleta("CCC1234", "item@teste.com");
 
-        // Act
+        
         var response = await _client.PostAsJsonAsync("/api/itemservico",
             new ItemServicoRequest("Troca de Vela", 50.00m, 4, os.Id));
 
-        // Assert
+        
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var criado = await response.Content.ReadFromJsonAsync<ItemServicoResponse>();
         Assert.NotNull(criado);
@@ -57,24 +57,24 @@ public class ItemServicoIntegrationTests : IClassFixture<CustomWebApplicationFac
     [Fact]
     public async Task FluxoCompleto_GerenciamentoDeItens_CriarAtualizarEDeletar()
     {
-        // Arrange
+       
         var os = await CriarOSCompleta("GOL1010", "fluxo_item@os.com");
 
         var itemRes = await _client.PostAsJsonAsync("/api/itemservico",
             new ItemServicoRequest("Pastilha", 100, 2, os.Id));
         var item = await itemRes.Content.ReadFromJsonAsync<ItemServicoResponse>();
 
-        // Act - atualizar
+        
         var putRes = await _client.PutAsJsonAsync($"/api/itemservico/{item!.Id}",
             new ItemServicoRequest("Pastilha", 100, 3, os.Id));
         Assert.Equal(HttpStatusCode.NoContent, putRes.StatusCode);
 
-        // Assert - itens da OS retornam HATEOAS
+        
         var getItensRes = await _client.GetAsync($"/api/itemservico/ordem/{os.Id}");
         var itens = await getItensRes.Content.ReadFromJsonAsync<List<HateoasResponse<ItemServicoResponse>>>();
         Assert.Equal(300.00m, itens![0].Data.ValorTotal);
 
-        // Act - deletar
+        
         var delRes = await _client.DeleteAsync($"/api/itemservico/{item.Id}");
         Assert.Equal(HttpStatusCode.NoContent, delRes.StatusCode);
     }

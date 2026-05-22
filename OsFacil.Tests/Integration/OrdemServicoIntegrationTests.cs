@@ -39,14 +39,14 @@ public class OrdemServicoIntegrationTests : IClassFixture<CustomWebApplicationFa
     [Fact]
     public async Task Post_OSValida_DeveRetornar201Created()
     {
-        // Arrange
+        
         var (user, func, carro) = await CriarPreRequisitos("TST1234", "dono@teste.com");
 
-        // Act
+       
         var response = await _client.PostAsJsonAsync("/api/ordemservico",
             new OrdemServicoRequest("Troca de Óleo", 150, user.Id, func.Id, carro.Id, StatusOS.EmExecucao));
 
-        // Assert
+        
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var osCriada = await response.Content.ReadFromJsonAsync<OrdemServicoResponse>();
         Assert.NotNull(osCriada);
@@ -56,23 +56,23 @@ public class OrdemServicoIntegrationTests : IClassFixture<CustomWebApplicationFa
     [Fact]
     public async Task FluxoGerenciamento_CriarAtualizarEStatus_DeveFuncionarCorretamente()
     {
-        // Arrange
+        
         var (user, func, carro) = await CriarPreRequisitos("FLX1234", "fluxo@os.com");
 
         var postRes = await _client.PostAsJsonAsync("/api/ordemservico",
             new OrdemServicoRequest("Revisão Geral", 500, user.Id, func.Id, carro.Id, StatusOS.EmExecucao));
         var os = await postRes.Content.ReadFromJsonAsync<OrdemServicoResponse>();
 
-        // Act - atualizar
+       
         var putRes = await _client.PutAsJsonAsync($"/api/ordemservico/{os!.Id}",
             new OrdemServicoRequest("Revisão + Filtro", 600, user.Id, func.Id, carro.Id, StatusOS.EmExecucao));
         Assert.Equal(HttpStatusCode.NoContent, putRes.StatusCode);
 
-        // Act - mudar status
+        
         var patchRes = await _client.PatchAsJsonAsync($"/api/ordemservico/{os.Id}/status", StatusOS.Concluido);
         Assert.Equal(HttpStatusCode.NoContent, patchRes.StatusCode);
 
-        // Assert - GetById retorna HATEOAS
+        
         var getRes = await _client.GetAsync($"/api/ordemservico/{os.Id}");
         var hateoas = await getRes.Content.ReadFromJsonAsync<HateoasResponse<OrdemServicoResponse>>();
         Assert.Equal(StatusOS.Concluido.ToString(), hateoas!.Data.Status);

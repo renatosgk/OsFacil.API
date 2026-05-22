@@ -46,7 +46,7 @@ public class ItemServicoControllerTests
     [Fact]
     public async Task Create_DadosValidos_SalvaEEnviaMensagem()
     {
-        // Arrange
+        
         var ctx = GetContext();
         ctx.OrdensServico.Add(new OrdemServico { Id = 1, Descricao = "OS Teste" });
         await ctx.SaveChangesAsync();
@@ -56,10 +56,10 @@ public class ItemServicoControllerTests
         var entity = new ItemServico { Id = 10, Descricao = "Troca de Filtro", OrdemServicoId = 1, PrecoUnitario = 50.00m };
         _mapperMock.Setup(m => m.Map<ItemServico>(request)).Returns(entity);
 
-        // Act
+        
         var result = await ctrl.Create(request);
 
-        // Assert
+       
         Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(1, ctx.ItensServico.Count());
         _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("ITEM_ADICIONADO"))), Times.Once);
@@ -68,15 +68,15 @@ public class ItemServicoControllerTests
     [Fact]
     public async Task Create_OrdemInexistente_RetornaBadRequest()
     {
-        // Arrange
+        
         var ctx = GetContext();
         var ctrl = CreateController(ctx);
         var request = new ItemServicoRequest("Item Orfão", 10.00m, 1, 999);
 
-        // Act
+       
         var result = await ctrl.Create(request);
 
-        // Assert
+        
         var badRequest = Assert.IsType<BadRequestObjectResult>(result);
         Assert.Contains("não existe", badRequest.Value!.ToString());
     }
@@ -84,7 +84,7 @@ public class ItemServicoControllerTests
     [Fact]
     public async Task GetByOrdem_FiltraCorretamente_RetornaApenasItensDaquelaOS()
     {
-        // Arrange
+        
         var ctx = GetContext();
         ctx.ItensServico.Add(new ItemServico { Id = 1, OrdemServicoId = 1, Descricao = "Item OS 1" });
         ctx.ItensServico.Add(new ItemServico { Id = 2, OrdemServicoId = 1, Descricao = "Outro Item OS 1" });
@@ -101,28 +101,28 @@ public class ItemServicoControllerTests
 
         var ctrl = CreateController(ctx);
 
-        // Act
+        
         var result = await ctrl.GetByOrdem(1);
 
-        // Assert
+        
         var okResult = Assert.IsType<OkObjectResult>(result);
-        // GetByOrdem returns List<HateoasResponse<ItemServicoResponse>>
+       
         Assert.NotNull(okResult.Value);
     }
 
     [Fact]
     public async Task Delete_ItemExiste_RemoveEEnviaMensagem()
     {
-        // Arrange
+        
         var ctx = GetContext();
         ctx.ItensServico.Add(new ItemServico { Id = 100, OrdemServicoId = 1, Descricao = "Pneu" });
         await ctx.SaveChangesAsync();
         var ctrl = CreateController(ctx);
 
-        // Act
+        
         var result = await ctrl.Delete(100);
 
-        // Assert
+        
         Assert.IsType<NoContentResult>(result);
         Assert.Equal(0, ctx.ItensServico.Count());
         _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("ITEM_REMOVIDO"))), Times.Once);

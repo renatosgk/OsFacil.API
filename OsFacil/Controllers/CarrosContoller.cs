@@ -12,7 +12,6 @@ using OsFacil.MongoDB;
 
 namespace OsFacil.Controllers;
 
-/// <summary>Gerenciamento de veículos</summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -35,7 +34,7 @@ public class CarrosController : ControllerBase
         _audit = audit;
     }
 
-    /// <summary>Lista veículos com paginação e filtro</summary>
+  
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<HateoasResponse<CarroResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] PaginationParams p)
@@ -72,7 +71,7 @@ public class CarrosController : ControllerBase
         });
     }
 
-    /// <summary>Obtém veículo por ID</summary>
+   
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(HateoasResponse<CarroResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -90,7 +89,7 @@ public class CarrosController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>Cadastra novo veículo</summary>
+    
     [HttpPost]
     [ProducesResponseType(typeof(CarroResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -114,7 +113,7 @@ public class CarrosController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = carro.Id }, _mapper.Map<CarroResponse>(carro));
     }
 
-    /// <summary>Atualiza veículo</summary>
+   
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -133,7 +132,7 @@ public class CarrosController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Remove veículo</summary>
+    
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

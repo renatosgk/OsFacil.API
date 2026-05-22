@@ -46,7 +46,7 @@ public class CarrosControllerTests
     [Fact]
     public async Task Create_DadosValidos_SalvaEEnviaMensagem()
     {
-        // Arrange
+        
         var ctx = GetContext();
         ctx.Usuarios.Add(new Usuario { Id = 1, Nome = "Renato" });
         await ctx.SaveChangesAsync();
@@ -56,10 +56,10 @@ public class CarrosControllerTests
         var entity = new Carro { Id = 10, Placa = "ABC1D23", UsuarioId = 1 };
         _mapperMock.Setup(m => m.Map<Carro>(request)).Returns(entity);
 
-        // Act
+       
         var result = await ctrl.Create(request);
 
-        // Assert
+       
         Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(1, ctx.Carros.Count());
         _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("CARRO_CADASTRADO"))), Times.Once);
@@ -68,15 +68,15 @@ public class CarrosControllerTests
     [Fact]
     public async Task Create_UsuarioInexistente_RetornaBadRequest()
     {
-        // Arrange
+        
         var ctx = GetContext();
         var ctrl = CreateController(ctx);
         var request = new CarroRequest("Ford", "Ka", 2020, "KKK0K00", 999);
 
-        // Act
+        
         var result = await ctrl.Create(request);
 
-        // Assert
+       
         var badRequest = Assert.IsType<BadRequestObjectResult>(result);
         Assert.Contains("não existe", badRequest.Value!.ToString());
     }
@@ -84,16 +84,16 @@ public class CarrosControllerTests
     [Fact]
     public async Task Delete_CarroExiste_RemoveEEnviaMensagem()
     {
-        // Arrange
+        
         var ctx = GetContext();
         ctx.Carros.Add(new Carro { Id = 50, Placa = "DEL1234" });
         await ctx.SaveChangesAsync();
         var ctrl = CreateController(ctx);
 
-        // Act
+       
         var result = await ctrl.Delete(50);
 
-        // Assert
+        
         Assert.IsType<NoContentResult>(result);
         Assert.Equal(0, ctx.Carros.Count());
         _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("CARRO_REMOVIDO"))), Times.Once);
@@ -102,7 +102,7 @@ public class CarrosControllerTests
     [Fact]
     public async Task GetById_CarroComUsuario_RetornaHateoas()
     {
-        // Arrange
+        
         var ctx = GetContext();
         var usuario = new Usuario { Id = 1, Nome = "Dono" };
         var carro = new Carro { Id = 1, Placa = "GET1234", Usuario = usuario };
@@ -114,10 +114,10 @@ public class CarrosControllerTests
 
         var ctrl = CreateController(ctx);
 
-        // Act
+       
         var result = await ctrl.GetById(1);
 
-        // Assert
+        
         var okResult = Assert.IsType<OkObjectResult>(result);
         var hateoasResp = Assert.IsType<HateoasResponse<CarroResponse>>(okResult.Value);
         Assert.Equal("GET1234", hateoasResp.Data.Placa);

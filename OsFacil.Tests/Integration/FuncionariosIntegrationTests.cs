@@ -20,11 +20,11 @@ public class FuncionariosIntegrationTests : IClassFixture<CustomWebApplicationFa
     [Fact]
     public async Task Post_FuncionarioValido_DeveRetornar201Created()
     {
-        // Act
+        
         var response = await _client.PostAsJsonAsync("/api/funcionarios",
             new FuncionarioRequest("Mecânico de Teste", "Senior", 5500.00m));
 
-        // Assert
+        
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var criado = await response.Content.ReadFromJsonAsync<FuncionarioResponse>();
         Assert.NotNull(criado);
@@ -35,22 +35,22 @@ public class FuncionariosIntegrationTests : IClassFixture<CustomWebApplicationFa
     [Fact]
     public async Task FluxoCompleto_GerenciamentoDeFuncionario_CriarAtualizarEDeletar()
     {
-        // Arrange
+       
         var postRes = await _client.PostAsJsonAsync("/api/funcionarios",
             new FuncionarioRequest("Carlos Silva", "Auxiliar", 2500.00m));
         var criado = await postRes.Content.ReadFromJsonAsync<FuncionarioResponse>();
 
-        // Act - atualizar
+        
         var putRes = await _client.PutAsJsonAsync($"/api/funcionarios/{criado!.Id}",
             new FuncionarioRequest("Carlos Silva", "Mecânico", 3500.00m));
         Assert.Equal(HttpStatusCode.NoContent, putRes.StatusCode);
 
-        // Assert - GetById retorna HateoasResponse
+        
         var getRes = await _client.GetAsync($"/api/funcionarios/{criado.Id}");
         var hateoas = await getRes.Content.ReadFromJsonAsync<HateoasResponse<FuncionarioResponse>>();
         Assert.Equal("Mecânico", hateoas!.Data.Cargo);
 
-        // Act - deletar
+        
         var delRes = await _client.DeleteAsync($"/api/funcionarios/{criado.Id}");
         Assert.Equal(HttpStatusCode.NoContent, delRes.StatusCode);
     }

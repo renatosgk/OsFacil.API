@@ -12,7 +12,7 @@ using OsFacil.MongoDB;
 
 namespace OsFacil.Controllers;
 
-/// <summary>Gerenciamento de usuários/clientes</summary>
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -35,7 +35,7 @@ public class UsuariosController : ControllerBase
         _audit = audit;
     }
 
-    /// <summary>Lista usuários com paginação e filtro</summary>
+    
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<HateoasResponse<UsuarioResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] PaginationParams p)
@@ -76,8 +76,7 @@ public class UsuariosController : ControllerBase
         });
     }
 
-    /// <summary>Obtém usuário por ID</summary>
-    /// <param name="id">ID do usuário</param>
+    
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(HateoasResponse<UsuarioResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -102,7 +101,7 @@ public class UsuariosController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>Cria novo usuário</summary>
+    
     [HttpPost]
     [AllowAnonymous]
     [ProducesResponseType(typeof(UsuarioResponse), StatusCodes.Status201Created)]
@@ -124,8 +123,7 @@ public class UsuariosController : ControllerBase
             _mapper.Map<UsuarioResponse>(usuario));
     }
 
-    /// <summary>Atualiza usuário existente</summary>
-    /// <param name="id">ID do usuário</param>
+   
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -144,8 +142,7 @@ public class UsuariosController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Remove usuário</summary>
-    /// <param name="id">ID do usuário</param>
+    
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

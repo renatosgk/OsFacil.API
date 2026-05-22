@@ -12,7 +12,7 @@ using OsFacil.MongoDB;
 
 namespace OsFacil.Controllers;
 
-/// <summary>Itens de serviço vinculados a Ordens de Serviço</summary>
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -35,7 +35,7 @@ public class ItemServicoController : ControllerBase
         _audit = audit;
     }
 
-    /// <summary>Lista todos os itens de serviço com paginação</summary>
+    
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<HateoasResponse<ItemServicoResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] PaginationParams p)
@@ -70,8 +70,7 @@ public class ItemServicoController : ControllerBase
         });
     }
 
-    /// <summary>Lista itens de uma Ordem de Serviço específica</summary>
-    /// <param name="ordemId">ID da Ordem de Serviço</param>
+   
     [HttpGet("ordem/{ordemId}")]
     [ProducesResponseType(typeof(IEnumerable<HateoasResponse<ItemServicoResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByOrdem(long ordemId)
@@ -84,7 +83,7 @@ public class ItemServicoController : ControllerBase
         return Ok(mapped);
     }
 
-    /// <summary>Obtém item de serviço por ID</summary>
+    
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(HateoasResponse<ItemServicoResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -102,7 +101,7 @@ public class ItemServicoController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>Adiciona item a uma Ordem de Serviço</summary>
+    
     [HttpPost]
     [ProducesResponseType(typeof(ItemServicoResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -126,7 +125,7 @@ public class ItemServicoController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = item.Id }, _mapper.Map<ItemServicoResponse>(item));
     }
 
-    /// <summary>Atualiza item de serviço</summary>
+    
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -145,7 +144,7 @@ public class ItemServicoController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Remove item de serviço</summary>
+    
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

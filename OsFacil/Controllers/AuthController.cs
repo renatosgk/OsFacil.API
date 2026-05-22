@@ -7,7 +7,6 @@ using OsFacil.Services;
 
 namespace OsFacil.Controllers;
 
-/// <summary>Autenticação JWT</summary>
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
@@ -24,9 +23,7 @@ public class AuthController : ControllerBase
         _log = log;
     }
 
-    /// <summary>Realiza login e retorna token JWT</summary>
-    /// <param name="request">Credenciais de acesso</param>
-    /// <returns>Token JWT com dados do usuário</returns>
+  
     [HttpPost("login")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -47,7 +47,7 @@ public class OrdemServicoControllerTests
     [Fact]
     public async Task Create_DadosValidos_SalvaEEnviaMensagem()
     {
-        // Arrange
+       
         var ctx = GetContext();
         ctx.Usuarios.Add(new Usuario { Id = 1, Nome = "Cliente" });
         ctx.Funcionarios.Add(new Funcionario { Id = 1, Nome = "Mecânico" });
@@ -59,10 +59,10 @@ public class OrdemServicoControllerTests
         var osEntity = new OrdemServico { Id = 10, Descricao = "Troca de Óleo", Valor = 150.00m };
         _mapperMock.Setup(m => m.Map<OrdemServico>(request)).Returns(osEntity);
 
-        // Act
+       
         var result = await ctrl.Create(request);
 
-        // Assert
+        
         Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(1, ctx.OrdensServico.Count());
         _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("OS_CRIADA"))), Times.Once);
@@ -71,15 +71,15 @@ public class OrdemServicoControllerTests
     [Fact]
     public async Task Create_UsuarioInexistente_RetornaBadRequest()
     {
-        // Arrange
+        
         var ctx = GetContext();
         var ctrl = CreateController(ctx);
         var request = new OrdemServicoRequest("Erro", 100, 99, 1, 1, StatusOS.EmExecucao);
 
-        // Act
+       
         var result = await ctrl.Create(request);
 
-        // Assert
+       
         var badRequest = Assert.IsType<BadRequestObjectResult>(result);
         Assert.Contains("UsuarioId", badRequest.Value!.ToString());
     }
@@ -87,16 +87,16 @@ public class OrdemServicoControllerTests
     [Fact]
     public async Task UpdateStatus_OSExiste_AtualizaEEnviaMensagem()
     {
-        // Arrange
+       
         var ctx = GetContext();
         ctx.OrdensServico.Add(new OrdemServico { Id = 5, Status = StatusOS.EmExecucao });
         await ctx.SaveChangesAsync();
         var ctrl = CreateController(ctx);
 
-        // Act
+        
         var result = await ctrl.UpdateStatus(5, StatusOS.Concluido);
 
-        // Assert
+       
         Assert.IsType<NoContentResult>(result);
         _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("OS_STATUS_ALTERADO"))), Times.Once);
     }
@@ -104,7 +104,7 @@ public class OrdemServicoControllerTests
     [Fact]
     public async Task GetById_OSExiste_RetornaHateoas()
     {
-        // Arrange
+        
         using var ctx = GetContext();
         ctx.Usuarios.Add(new Usuario { Id = 1, Nome = "Cliente Teste", Email = "teste@teste.com" });
         ctx.Carros.Add(new Carro { Id = 1, Placa = "ABC1234", Marca = "Teste", Modelo = "Teste" });
@@ -121,10 +121,10 @@ public class OrdemServicoControllerTests
 
         var ctrl = CreateController(ctx);
 
-        // Act
+        
         var result = await ctrl.GetById(1);
 
-        // Assert
+       
         var okResult = Assert.IsType<OkObjectResult>(result);
         var hateoasResp = Assert.IsType<HateoasResponse<OrdemServicoResponse>>(okResult.Value);
         Assert.Equal("Conserto Teste", hateoasResp.Data.Descricao);

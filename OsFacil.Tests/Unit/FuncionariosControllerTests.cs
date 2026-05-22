@@ -46,17 +46,17 @@ public class FuncionariosControllerTests
     [Fact]
     public async Task Create_DadosValidos_SalvaEEnviaMensagem()
     {
-        // Arrange
+        
         var ctx = GetContext();
         var ctrl = CreateController(ctx);
         var request = new FuncionarioRequest("Renato Mecânico", "Senior", 5000.00m);
         var entity = new Funcionario { Id = 1, Nome = "Renato Mecânico", Cargo = "Senior" };
         _mapperMock.Setup(m => m.Map<Funcionario>(request)).Returns(entity);
 
-        // Act
+        
         var result = await ctrl.Create(request);
 
-        // Assert
+       
         Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(1, ctx.Funcionarios.Count());
         _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("FUNCIONARIO_CRIADO"))), Times.Once);
@@ -65,17 +65,17 @@ public class FuncionariosControllerTests
     [Fact]
     public async Task Update_FuncionarioExiste_AtualizaEEnviaMensagem()
     {
-        // Arrange
+        
         var ctx = GetContext();
         ctx.Funcionarios.Add(new Funcionario { Id = 1, Nome = "Antigo Nome", Cargo = "Junior" });
         await ctx.SaveChangesAsync();
         var ctrl = CreateController(ctx);
         var request = new FuncionarioRequest("Novo Nome", "Pleno", 3500.00m);
 
-        // Act
+       
         var result = await ctrl.Update(1, request);
 
-        // Assert
+       
         Assert.IsType<NoContentResult>(result);
         _busMock.Verify(b => b.SendMessage(It.Is<string>(s => s.Contains("FUNCIONARIO_ATUALIZADO"))), Times.Once);
     }
@@ -83,23 +83,23 @@ public class FuncionariosControllerTests
     [Fact]
     public async Task Delete_FuncionarioInexistente_RetornaNotFound()
     {
-        // Arrange
+        
         var ctx = GetContext();
         ctx.Funcionarios.Add(new Funcionario { Id = 1, Nome = "Mecânico com OS" });
         await ctx.SaveChangesAsync();
         var ctrl = CreateController(ctx);
 
-        // Act
+        
         var result = await ctrl.Delete(999);
 
-        // Assert
+        
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact]
     public async Task GetAll_ExistemFuncionarios_RetornaPagedResult()
     {
-        // Arrange
+        
         var ctx = GetContext();
         ctx.Funcionarios.Add(new Funcionario { Id = 1, Nome = "Func 1" });
         ctx.Funcionarios.Add(new Funcionario { Id = 2, Nome = "Func 2" });
@@ -115,10 +115,10 @@ public class FuncionariosControllerTests
 
         var ctrl = CreateController(ctx);
 
-        // Act
+      
         var result = await ctrl.GetAll(new PaginationParams());
 
-        // Assert
+        
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.NotNull(okResult.Value);
     }

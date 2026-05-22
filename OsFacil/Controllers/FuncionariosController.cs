@@ -12,7 +12,7 @@ using OsFacil.MongoDB;
 
 namespace OsFacil.Controllers;
 
-/// <summary>Gerenciamento de funcionários</summary>
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -35,7 +35,7 @@ public class FuncionariosController : ControllerBase
         _audit = audit;
     }
 
-    /// <summary>Lista funcionários com paginação e filtro</summary>
+    
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<HateoasResponse<FuncionarioResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] PaginationParams p)
@@ -72,7 +72,7 @@ public class FuncionariosController : ControllerBase
         });
     }
 
-    /// <summary>Obtém funcionário por ID</summary>
+    
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(HateoasResponse<FuncionarioResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -90,7 +90,7 @@ public class FuncionariosController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>Cadastra funcionário</summary>
+    
     [HttpPost]
     [ProducesResponseType(typeof(FuncionarioResponse), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(FuncionarioRequest request)
@@ -107,7 +107,7 @@ public class FuncionariosController : ControllerBase
             _mapper.Map<FuncionarioResponse>(funcionario));
     }
 
-    /// <summary>Atualiza funcionário</summary>
+    
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -126,7 +126,7 @@ public class FuncionariosController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Remove funcionário</summary>
+    
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

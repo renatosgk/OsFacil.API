@@ -35,7 +35,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
             if (dbDescriptor != null) services.Remove(dbDescriptor);
 
-            // Capture DB name outside the lambda so all requests share the same DB
+            
             var dbName = "OsFacilTestDb_" + Guid.NewGuid();
             services.AddDbContext<AppDbContext>(options =>
                 options.UseInMemoryDatabase(dbName));
@@ -47,12 +47,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             var rabbitMock = new Mock<RabbitMqProducer>(new Mock<IConfiguration>().Object);
             services.AddSingleton(rabbitMock.Object);
 
-            // Remove RabbitMqConsumer hosted service to prevent socket errors
+           
             var hostedDescriptor = services.SingleOrDefault(
                 d => d.ImplementationType == typeof(RabbitMqConsumer));
             if (hostedDescriptor != null) services.Remove(hostedDescriptor);
 
-            // Mock IMongoAuditService (no real MongoDB in tests)
+            
             var mongoDescriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(IMongoAuditService));
             if (mongoDescriptor != null) services.Remove(mongoDescriptor);

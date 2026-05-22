@@ -20,22 +20,22 @@ public class CarrosIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task FluxoCompleto_CriarCarroValido_DeveRetornar201EPersistir()
     {
-        // Arrange - cria usuário primeiro (AllowAnonymous)
+       
         var userRes = await _client.PostAsJsonAsync("/api/usuarios",
             new UsuarioRequest("Dono do Carro", "dono@teste.com", "senha123"));
         var user = await userRes.Content.ReadFromJsonAsync<UsuarioResponse>();
 
-        // Act
+        
         var postResponse = await _client.PostAsJsonAsync("/api/carros",
             new CarroRequest("Honda", "Civic", 2024, "ABC1D23", user!.Id));
 
-        // Assert
+        
         Assert.Equal(HttpStatusCode.Created, postResponse.StatusCode);
         var carroCriado = await postResponse.Content.ReadFromJsonAsync<CarroResponse>();
         Assert.NotNull(carroCriado);
         Assert.Equal("ABC1D23", carroCriado.Placa);
 
-        // Verifica via listagem paginada
+        
         var getResponse = await _client.GetAsync("/api/carros");
         var pagedList = await getResponse.Content.ReadFromJsonAsync<PagedResult<HateoasResponse<CarroResponse>>>();
         Assert.Contains(pagedList!.Data, c => c.Data.Id == carroCriado.Id);
@@ -44,11 +44,11 @@ public class CarrosIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Post_CarroComUsuarioInexistente_DeveRetornar400()
     {
-        // Act
+      
         var response = await _client.PostAsJsonAsync("/api/carros",
             new CarroRequest("Ford", "Ka", 2020, "KKK0K00", 9999));
 
-        // Assert
+       
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
@@ -62,7 +62,7 @@ public class CarrosIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Delete_CarroExistente_DeveRetornar204()
     {
-        // Arrange
+        
         var userRes = await _client.PostAsJsonAsync("/api/usuarios",
             new UsuarioRequest("Dono Deletar", "del@carro.com", "senha123"));
         Assert.Equal(HttpStatusCode.Created, userRes.StatusCode);
@@ -75,10 +75,10 @@ public class CarrosIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var carro = System.Text.Json.JsonSerializer.Deserialize<CarroResponse>(carroJson,
             new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        // Act
+       
         var response = await _client.DeleteAsync($"/api/carros/{carro!.Id}");
 
-        // Assert
+       
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 }
